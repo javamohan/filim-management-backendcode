@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,20 +51,28 @@ public class TestController {
 	
 	@PostMapping(value = "/upload")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	public String create(/* @RequestParam String name, @RequestParam String description, */
-			@RequestParam("file") MultipartFile multipartFile) throws IOException {
-		logger.debug("Saving employees.");
-		Filim emp = new Filim();
-		emp.setName("name");
-		emp.setDescription("description");
-		emp.setRealeaseDate(new Date());
-		emp.setRating(3); // 1 to  5
-		emp.setTicketPrice(1000);
-		emp.setCountry("UAE");
-		emp.setGenre(Arrays.asList()); // List
-		emp.setPhoto(new Binary(BsonBinarySubType.BINARY, multipartFile.getBytes()));
-		serv.addFilim(emp);
-		return "Employee records created.";
+	public String create(
+			@RequestParam(value = "file" , required = false, defaultValue = "defaultFile") MultipartFile multipartFile, 
+			@RequestParam(value = "name", required = true) String name,
+			@RequestParam(value = "description", required = true) String description,
+			@RequestParam(value = "realeaseDate", required = false) Date realeaseDate,
+			@RequestParam(value = "rating", required = false) int rating,
+			@RequestParam(value = "ticketPrice", required = false) int ticketPrice,
+			@RequestParam(value = "country", required = true) String country,
+			@RequestParam(value = "genre", required = true) String genre
+			) throws IOException {
+		logger.debug("Saving Filim... Enter!!");
+		Filim filim = new Filim();
+		filim.setName(name);
+		filim.setDescription(description);
+		filim.setRealeaseDate(realeaseDate);
+		filim.setRating(rating); // 1 to  5
+		filim.setTicketPrice(ticketPrice);
+		filim.setCountry(country);
+		filim.setGenre(Arrays.asList(genre)); // List
+		filim.setPhoto(new Binary(BsonBinarySubType.BINARY, multipartFile.getBytes()));
+		serv.addFilim(filim);
+		return "Filim created.";
 	}
 
 
